@@ -7,7 +7,7 @@ $(function() { //when DOM is ready...
         {username:'Elijah'}
     ]);
 
-    app.tasks = new IssueCollection([
+    app.tasks = new TaskCollection([
         //XXX these are in `defaults`
         // test task 1
         {title: 'Pinball repair',
@@ -33,4 +33,5 @@ $(function() { //when DOM is ready...
     ]);
 
     app.gui = new GUI(app.users, app.tasks, '#app');// selector of main div
-}
+    app.loginView = new app.gui.loginView({collection: app.users});
+});
