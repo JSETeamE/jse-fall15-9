@@ -7,12 +7,21 @@ var GUI = (function(){ //IIFE for all Views
     var CreateTaskView = Backbone.View.extend({
     
     });
-    
     var UnassignedTasksView = Backbone.View.extend({
+        render: function() {
+            // XXX not done
+            var newTaskBtn = '<button id="newTask"> Create new Task </button>';
+            this.$el.html('<div>' + newTaskBtn + '</div>');
+        },
+        events: {
+            "click #newTask" : "CreateTaskView"
+        }
     
     });
-    
     var UserTasksView = Backbone.View.extend({
+        render: function() {
+            // XXX all tasks that belong or were created by user
+        },
     
     });
     
