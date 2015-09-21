@@ -31,7 +31,6 @@ $(function() { //when DOM is ready...
             status: 'done'
         }
     ]);
-
     app.gui = new GUI(app.users, app.tasks, '#app');// selector of main div
     app.loginView = new app.gui.loginView({collection: app.users});
 });
