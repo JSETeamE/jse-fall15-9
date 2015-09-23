@@ -1,0 +1,30 @@
+/* stuff from Elizabeth, pretty basic so far*/
+
+#wholeview {
+    background-color: gray;
+    width: 310px;
+
+}
+
+#title, #des, #creator {
+    border: 2px;
+    border-color: black;
+    background-color: lightgray;
+    margin-top: 5px;
+    margin-left: 5px;
+    display: inline-block;
+    vertical-align: center;
+    width: 300px;
+
+
+}
+
+#assignBtn {
+    background-color: lightblue;
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-bottom: 5px;
+
+
+}
+
