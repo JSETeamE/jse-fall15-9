@@ -25,6 +25,15 @@ var GUI = (function(){ //IIFE for all Views
     var UnassignedTasksView = Backbone.View.extend({
         render: function() {
             var newTaskBtn = '<button id="newTask"> Create new Task </button>';
+            // loop over task collection status
+            this.collection.each(function(model) {
+                if (model.attributes.status = 'unassigned') {
+                    var task = this.model;
+                    var newTask = new TaskView(task);
+                    html += newTask.render();
+                }
+            });
+            // XXX fix this
             this.$el.html(newTaskBtn);
         },
         events: {
@@ -35,6 +44,9 @@ var GUI = (function(){ //IIFE for all Views
             // make new CreateTasksView
             var tasks = new CreateTasksView();
             this.$el.append(tasks);
+        },
+        initialize: function(){   
+            this.render();
         }
     });
     var UserTasksView = Backbone.View.extend({

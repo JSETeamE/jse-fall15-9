@@ -14,23 +14,24 @@ $(function() { //when DOM is ready...
             description: 'Check standup switches on SBM',
             creator: 'Elijah',
             assignee: 'Elijah',
-            status: 'assigned'
+            status: 'unassigned'
         },
         // test task 2
         {title: 'Hack the Planet!',
             description: 'H4x0r the Gibson',
             creator: 'Elizabeth',
             assignee: 'Elizabeth',
-            status: 'in progress'
+            status: 'unassigned'
         },
         // test task 3
         {title: 'Bike ride',
             description: 'Ride bike for fun',
             creator: 'Emi',
             assignee: 'Emi',
-            status: 'done'
+            status: 'unassigned'
         }
     ]);
     app.gui = new GUI(app.users, app.tasks, '#app');// selector of main div
     app.loginView = new app.gui.loginView({collection: app.users});
+    // app.unassignedTasksView = new app.gui.UnassignedTasksView({collection: app.tasks});
 });
