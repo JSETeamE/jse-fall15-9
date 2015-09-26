@@ -13,8 +13,8 @@ $(function() { //when DOM is ready...
         {title: 'Pinball repair',
             description: 'Check standup switches on SBM',
             creator: 'Elijah',
-            assignee: null,
-            status: 'unassigned'
+            assignee: 'Elijah',
+            status: 'assigned'
         },
         // test task 2
         {title: 'Hack the Planet!',
@@ -29,7 +29,14 @@ $(function() { //when DOM is ready...
             creator: 'Emi',
             assignee: 'Emi',
             status: 'unassigned'
+        },
+        {title: 'Bake cookies',
+            description: 'use oven',
+            creator: 'Emi',
+            assignee: 'Emi',
+            status: 'unassigned'
         }
+
     ]);
     app.gui = new GUI(app.users, app.tasks, '#app');// selector of main div
     //app.unassignedTasksView = new app.gui.UnassignedTasksView({collection: app.tasks});

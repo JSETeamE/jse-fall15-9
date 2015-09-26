@@ -10,56 +10,53 @@ var GUI = (function(){ //IIFE for all Views
 
     var TaskView = Backbone.View.extend({
         render: function(){
+            var self = this;
             this.$el.html(this.template(this.model.attributes));
+            app.users.each(function(model){
+                self.$("#userSelect").append('<option>' + model.attributes.username + '</option>');
+            });
         },
         initialize: function(){
-            this.el.id = "hello";
-            this.render();
+            //this.render();
 
         },
         events: {
             //"click assignBtn" : //change the state of the assignee
         },
-        template: _.template('<div id=wholeview><div id=title>{{title}}</div><div id=des> {{description}}</div><div id=creator>{{creator}}</div><button id=assignBtn>Assign</button></div>')
+        template: _.template('<div id=wholeview><div id=title>Task: {{title}}</div><div id=des>Details: {{description}}</div><div id=creator>Creator: {{creator}}</div><select id=userSelect></select><button id=assignBtn>Assign</button></div>')
     });
 
     var UnassignedTasksView = Backbone.View.extend({
-         el: '#taskZone',
-        
+        el: '#taskZone',
+
         initialize: function(){
-            this.render();
+            //this.render();
         },
-        events: {       
-            'click #unasignedTask': 'unasignedTask'
+        events: {
+            //not currently using
+            'click #unassignedTask': 'unassignedTask'
         },
-        unasignedTask: function(){
-            var taskIndex = parseInt($('#tasks', this.$el).val());
-            var tasks = this.collection.at(taskIndex);
-            //alert('You are logged in as: ' + $('#users', this.$el).val());
-            // replace login with userView
-            var tasks = new UnassignedTasksView({model: tasks});
-            //user.render();
-        },  
-
-
+        // unassignedTask: function(){
+        //     var taskIndex = parseInt($('#tasks', this.$el).val());
+        //     var tasks = this.collection.at(taskIndex);
+        //     // replace login with userView
+        //     var tasks = new UnassignedTasksView({model: tasks});
+        // },
         render: function() {
-
-            var html = 'Do some work<br';
-            var x = 0;
+            var self = this;
+            var html = 'Do some work<br>';
+            this.$el.html(html);
             this.collection.each(function(model){
                 var task = model.attributes;
                 var status = task.status;
-                var description = task.description;
-                html += '<select id =description>'
-                ++x;
-
+                if (status === 'unassigned'){
+                    var unTask = new TaskView({model: model});
+                    unTask.render();
+                    self.$el.append(unTask.$el);
+                }
             });
-
-            html += '<button id="newTask"> Create new Task </button>';
-            this.$el.html(html);
-
+            this.$el.append('<button id="newTask"> Create new Task </button>');
             return this; // enable chained calls
-
         },
         events: {
             "click #newTask" : "createTask"
@@ -72,10 +69,22 @@ var GUI = (function(){ //IIFE for all Views
         }
     });
     var UserTasksView = Backbone.View.extend({
+        el: "#userTasks",
         render: function() {
-            // XXX all tasks that belong or were created by user
+            var self = this;
+            var username = this.model.attributes.username;
+            this.collection.each(function(model){
+                var task = model.attributes;
+                var assignee = task.assignee;
+                var creator = task.creator;
+                if ((assignee === username)||(creator === username)){
+                    var task = new TaskView({model:model});
+                    task.render();
+                    self.$el.append(task.$el);
+                }
+            });
         },
-    
+
     });
     var CreateTasksView = Backbone.View.extend({
         render: function(){
@@ -101,10 +110,7 @@ var GUI = (function(){ //IIFE for all Views
         cancel: function(){
             this.remove();
         },
-
         template: _.template('<input type="text" id="createTaskTitle"></input> <input type="text" id="createTaskDescription"></input><button id="createBtn">create</button><button id="cancelBtn">cancel</button>')
-
-
     });
 
     var LoginView = Backbone.View.extend({
@@ -117,61 +123,53 @@ var GUI = (function(){ //IIFE for all Views
                 html += '<option value=' + x + '>' + username + '</option>';
                 ++x;
             });
-
-        html += '</select><br /><button id=login>Login</button>';
-
-        this.$el.html(html);        
-        return this; // enable chained calls
+            html += '</select><br /><button id=login>Login</button>';
+            this.$el.html(html);
+            return this; // enable chained calls
         },
         initialize: function(){
             this.render();
         },
-        events: {       
+        events: {
             'click #login': 'login'
         },
         login: function(){
             var userIndex = parseInt($('#users', this.$el).val());
             var user = this.collection.at(userIndex);
-            //alert('You are logged in as: ' + $('#users', this.$el).val());
             // replace login with userView
             var user = new UserView({model: user});
             user.render();
-        }  
+        }
 
     });
 
-
-
     var UserView = Backbone.View.extend({
         el: '#taskZone',
-         template: _.template("Welcome {{who}}"),
-            render: function() {
+        template: _.template("Welcome {{who}}"),
+        render: function() {
             var user = this.model;
             var username = user.attributes.username;
             var welcomeMessage = this.template({who: username});
             var logoutButton = ' <button id=logout>Log out</button>';
             // this uses the UnassignedTaskView
-            var unassigned = new UnassignedTasksView({collection: _tasks});
-            //unassigned.render();
+            var unassigned = new UnassignedTasksView({collection: app.tasks});
             var unassignedHtml = unassigned.$el.html();
-
-            var html = welcomeMessage + logoutButton +'<div id=availableTask>' + unassignedHtml + '</div>';
-            
-             this.$el.html(html);
+            //create userTaskView
+            var userTask = new UserTasksView({collection: app.tasks, model: this.model});
+            var userTaskHtml = userTask.$el.html();
+            var html = welcomeMessage + logoutButton +'<div id=availableTask>' + unassignedHtml + '</div>' + '<div id=userTask>' + userTaskHtml + '</div>';
+            this.$el.html(html);
+            unassigned.render();
+            userTask.render();
         },
         events:{
              'click #logout': 'logout'
         },
         logout: function(){
-            
+
             location.reload();
-        } 
+        }
     });
-
-    var _users = null;
-    var _tasks = null;
-    var _el = null;
-
 
     // generic ctor to represent interface:
     function GUI(users,tasks,el) {
@@ -180,14 +178,14 @@ var GUI = (function(){ //IIFE for all Views
         //$("#app").append(taskview.el);
         //var createTaskView = new CreateTaskView({username:'Elizabeth'});
         //$("#app").append(createTaskView.el);
-        
-        // users is collection of User models
-        _users = users;
-        // tasks is collection of Task models
-        _tasks = tasks;
-        // el is selector for where GUI connects in DOM
-        _el = el;
-        // loginview
+
+        // // users is collection of User models
+        // _users = users;
+        // // tasks is collection of Task models
+        // _tasks = tasks;
+        // // el is selector for where GUI connects in DOM
+        // _el = el;
+        // // loginview
         this.loginView = LoginView;
 
     }

@@ -1,4 +1,4 @@
-/* stuff from Elizabeth, pretty basic so far*/
+
 
 #wholeview {
     background-color: gray;
@@ -27,15 +27,13 @@
 
 
 }
-
-#availableTask{
+/*
+#availableTask, #taskZone, #userTasks {
     border: 3px solid black;
-    width: 700px;
-    height:300px;
+    width: 300px;
+    height:200px;
     margin-top: 10px;
 
 }
 
-#taskZone{
 
-}
