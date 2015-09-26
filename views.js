@@ -11,9 +11,13 @@ var GUI = (function(){ //IIFE for all Views
     var TaskView = Backbone.View.extend({
         render: function(){
             var self = this;
+            var statusOption = ["unassigned", "assigned", "in progress", "done"];
             this.$el.html(this.template(this.model.attributes));
-            app.users.each(function(model){
-                self.$("#userSelect").append('<option>' + model.attributes.username + '</option>');
+            //app.tasks.each(function(model){
+              //  self.$("#userSelect").append('<option>' + model.attributes.username + '</option>');
+            //});
+            statusOption.forEach(function(status){
+                self.$("#statusSelect").append('<option>' + status + '</option>');
             });
         },
         initialize: function(){
@@ -23,14 +27,13 @@ var GUI = (function(){ //IIFE for all Views
         events: {
             //"click assignBtn" : //change the state of the assignee
         },
-        template: _.template('<div id=wholeview><div id=title>Task: {{title}}</div><div id=des>Details: {{description}}</div><div id=creator>Creator: {{creator}}</div><select id=userSelect></select><button id=assignBtn>Assign</button></div>')
+        template: _.template('<div id=wholeview><div id=title>Task: {{title}}</div><div id=des>Details: {{description}}</div><div id=creator>Creator: {{creator}}</div><div id=status>Status: {{status}}</div>Change Status  <select id=statusSelect></select></div>')
     });
 
     var UnassignedTasksView = Backbone.View.extend({
-        el: '#taskZone',
 
         initialize: function(){
-            //this.render();
+            this.render();
         },
         events: {
             //not currently using
@@ -62,14 +65,12 @@ var GUI = (function(){ //IIFE for all Views
             "click #newTask" : "createTask"
         },
         createTask: function() {
-            // XXX broken, needs to supply username?
-            // make new CreateTasksView
-            var tasks = new CreateTasksView();
+            var tasks = new CreateTasksView({username: this.model.attributes.username});
             this.$el.append(tasks);
         }
     });
     var UserTasksView = Backbone.View.extend({
-        el: "#userTasks",
+
         render: function() {
             var self = this;
             var username = this.model.attributes.username;
@@ -84,11 +85,15 @@ var GUI = (function(){ //IIFE for all Views
                 }
             });
         },
+        initialize: function(){
+            this.render();
+        }
 
     });
     var CreateTasksView = Backbone.View.extend({
         render: function(){
             this.$el.html(this.template());
+            this.$el.prependTo($("#app"));
         },
         initialize: function(opts){
             this.$el.addClass('createTask');
@@ -110,11 +115,10 @@ var GUI = (function(){ //IIFE for all Views
         cancel: function(){
             this.remove();
         },
-        template: _.template('<input type="text" id="createTaskTitle"></input> <input type="text" id="createTaskDescription"></input><button id="createBtn">create</button><button id="cancelBtn">cancel</button>')
+        template: _.template('Task: <input type="text" id="createTaskTitle"> Details:<input type="text" id="createTaskDescription"><button id="createBtn">create</button><button id="cancelBtn">cancel</button>')
     });
 
     var LoginView = Backbone.View.extend({
-        el: '#taskZone',
         render: function(){
             var html = 'Select a User <select id=users>';
             var x = 0;
@@ -125,6 +129,7 @@ var GUI = (function(){ //IIFE for all Views
             });
             html += '</select><br /><button id=login>Login</button>';
             this.$el.html(html);
+            $('#app').append(this.$el);
             return this; // enable chained calls
         },
         initialize: function(){
@@ -144,7 +149,7 @@ var GUI = (function(){ //IIFE for all Views
     });
 
     var UserView = Backbone.View.extend({
-        el: '#taskZone',
+        //el: '#loginView',
         template: _.template("Welcome {{who}}"),
         render: function() {
             var user = this.model;
@@ -152,15 +157,20 @@ var GUI = (function(){ //IIFE for all Views
             var welcomeMessage = this.template({who: username});
             var logoutButton = ' <button id=logout>Log out</button>';
             // this uses the UnassignedTaskView
-            var unassigned = new UnassignedTasksView({collection: app.tasks});
-            var unassignedHtml = unassigned.$el.html();
+            var unassigned = new UnassignedTasksView({collection: app.tasks, model: this.model});
+
             //create userTaskView
             var userTask = new UserTasksView({collection: app.tasks, model: this.model});
-            var userTaskHtml = userTask.$el.html();
-            var html = welcomeMessage + logoutButton +'<div id=availableTask>' + unassignedHtml + '</div>' + '<div id=userTask>' + userTaskHtml + '</div>';
-            this.$el.html(html);
-            unassigned.render();
-            userTask.render();
+
+            //var html = welcomeMessage + logoutButton +'<div id=availableTask>' + unassignedHtml + '</div>' + '<div id=userTask>' + userTaskHtml + '</div>';
+            app.gui.loginView.remove();
+            this.$el.append(welcomeMessage + logoutButton);
+            this.$el.append(unassigned.$el);
+            this.$el.append(userTask.$el);
+            $('#app').append(this.$el);
+            //unassigned.render();
+            //userTask.render();
+
         },
         events:{
              'click #logout': 'logout'
@@ -186,7 +196,7 @@ var GUI = (function(){ //IIFE for all Views
         // // el is selector for where GUI connects in DOM
         // _el = el;
         // // loginview
-        this.loginView = LoginView;
+        this.loginView = new LoginView({collection: app.users});
 
     }
     return GUI;

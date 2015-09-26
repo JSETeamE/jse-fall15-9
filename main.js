@@ -40,5 +40,5 @@ $(function() { //when DOM is ready...
     ]);
     app.gui = new GUI(app.users, app.tasks, '#app');// selector of main div
     //app.unassignedTasksView = new app.gui.UnassignedTasksView({collection: app.tasks});
-    app.loginView = new app.gui.loginView({collection: app.users});
+    //app.loginView = new app.gui.({collection: app.users});
 });
