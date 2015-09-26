@@ -1,5 +1,6 @@
 var GUI = (function(){ //IIFE for all Views
 
+
     function useMustacheTemplates() {
         _.templateSettings = {
             interpolate: /\{\{(.+?)\}\}/g
@@ -23,18 +24,42 @@ var GUI = (function(){ //IIFE for all Views
     });
 
     var UnassignedTasksView = Backbone.View.extend({
+         el: '#taskZone',
+        
+        initialize: function(){
+            this.render();
+        },
+        events: {       
+            'click #unasignedTask': 'unasignedTask'
+        },
+        unasignedTask: function(){
+            var taskIndex = parseInt($('#tasks', this.$el).val());
+            var tasks = this.collection.at(taskIndex);
+            //alert('You are logged in as: ' + $('#users', this.$el).val());
+            // replace login with userView
+            var tasks = new UnassignedTasksView({model: tasks});
+            //user.render();
+        },  
+
+
         render: function() {
-            var newTaskBtn = '<button id="newTask"> Create new Task </button>';
-            // loop over task collection status
-            this.collection.each(function(model) {
-                if (model.attributes.status = 'unassigned') {
-                    var task = this.model;
-                    var newTask = new TaskView(task);
-                    html += newTask.render();
-                }
+
+            var html = 'Do some work<br';
+            var x = 0;
+            this.collection.each(function(model){
+                var task = model.attributes;
+                var status = task.status;
+                var description = task.description;
+                html += '<select id =description>'
+                ++x;
+
             });
-            // XXX fix this
-            this.$el.html(newTaskBtn);
+
+            html += '<button id="newTask"> Create new Task </button>';
+            this.$el.html(html);
+
+            return this; // enable chained calls
+
         },
         events: {
             "click #newTask" : "createTask"
@@ -44,9 +69,6 @@ var GUI = (function(){ //IIFE for all Views
             // make new CreateTasksView
             var tasks = new CreateTasksView();
             this.$el.append(tasks);
-        },
-        initialize: function(){   
-            this.render();
         }
     });
     var UserTasksView = Backbone.View.extend({
@@ -118,6 +140,8 @@ var GUI = (function(){ //IIFE for all Views
 
     });
 
+
+
     var UserView = Backbone.View.extend({
         el: '#taskZone',
          template: _.template("Welcome {{who}}"),
@@ -127,8 +151,8 @@ var GUI = (function(){ //IIFE for all Views
             var welcomeMessage = this.template({who: username});
             var logoutButton = ' <button id=logout>Log out</button>';
             // this uses the UnassignedTaskView
-            var unassigned = new UnassignedTasksView();
-            unassigned.render();
+            var unassigned = new UnassignedTasksView({collection: _tasks});
+            //unassigned.render();
             var unassignedHtml = unassigned.$el.html();
 
             var html = welcomeMessage + logoutButton +'<div id=availableTask>' + unassignedHtml + '</div>';
@@ -144,6 +168,10 @@ var GUI = (function(){ //IIFE for all Views
         } 
     });
 
+    var _users = null;
+    var _tasks = null;
+    var _el = null;
+
 
     // generic ctor to represent interface:
     function GUI(users,tasks,el) {
@@ -154,13 +182,14 @@ var GUI = (function(){ //IIFE for all Views
         //$("#app").append(createTaskView.el);
         
         // users is collection of User models
-        this.users = users;
+        _users = users;
         // tasks is collection of Task models
-        this.tasks = tasks;
+        _tasks = tasks;
         // el is selector for where GUI connects in DOM
-        this.el = el;
+        _el = el;
         // loginview
         this.loginView = LoginView;
+
     }
     return GUI;
 }());
