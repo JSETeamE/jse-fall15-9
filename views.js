@@ -34,11 +34,12 @@ var GUI = (function(){ //IIFE for all Views
 
         initialize: function(){
             this.render();
+            this.listenTo(this.collection, 'add', this.render);
         },
-        events: {
+        //events: {
             //not currently using
-            'click #unassignedTask': 'unassignedTask'
-        },
+           // 'click #unassignedTask': 'unassignedTask'
+        //},
         // unassignedTask: function(){
         //     var taskIndex = parseInt($('#tasks', this.$el).val());
         //     var tasks = this.collection.at(taskIndex);
@@ -58,7 +59,7 @@ var GUI = (function(){ //IIFE for all Views
                     self.$el.append(unTask.$el);
                 }
             });
-            this.$el.append('<button id="newTask"> Create new Task </button>');
+            this.$el.prepend('<button id="newTask"> Create new Task </button>');
             return this; // enable chained calls
         },
         events: {
@@ -72,6 +73,8 @@ var GUI = (function(){ //IIFE for all Views
     var UserTasksView = Backbone.View.extend({
 
         render: function() {
+            var html = 'My Tasks<br>';
+            this.$el.html(html);
             var self = this;
             var username = this.model.attributes.username;
             this.collection.each(function(model){
@@ -87,6 +90,7 @@ var GUI = (function(){ //IIFE for all Views
         },
         initialize: function(){
             this.render();
+            this.listenTo(this.collection, 'add', this.render);
         }
 
     });
@@ -110,12 +114,14 @@ var GUI = (function(){ //IIFE for all Views
             var title = $("#createTaskTitle").val();
             var description = $("#createTaskDescription").val();
             var creator = this.username;
-            var freshTask = app.tasks.add({"title":title, "description":description, "creator":creator});
+            app.tasks.add({"title":title, "description":description, "creator":creator});
+            //app.unassigned.render();
+            this.remove();
         },
         cancel: function(){
             this.remove();
         },
-        template: _.template('Task: <input type="text" id="createTaskTitle"> Details:<input type="text" id="createTaskDescription"><button id="createBtn">create</button><button id="cancelBtn">cancel</button>')
+        template: _.template('Task:<input type="text" id="createTaskTitle"><br>Details:<input type="textarea" id="createTaskDescription"><br><button id="createBtn">create</button><button id="cancelBtn">cancel</button>')
     });
 
     var LoginView = Backbone.View.extend({
@@ -158,7 +164,7 @@ var GUI = (function(){ //IIFE for all Views
             var logoutButton = ' <button id=logout>Log out</button>';
             // this uses the UnassignedTaskView
             var unassigned = new UnassignedTasksView({collection: app.tasks, model: this.model});
-
+            //app.unassigned = unassigned;
             //create userTaskView
             var userTask = new UserTasksView({collection: app.tasks, model: this.model});
 
